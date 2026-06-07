@@ -979,5 +979,30 @@
 
     window.onload = init;
 </script>
+    <div style="position: fixed; bottom: 10px; right: 10px; z-index: 9999; display: flex; gap: 10px;">
+    <button onclick="cheatMaxLevel()" style="background: #f59e0b; color: black; border: none; padding: 8px 12px; border-radius: 8px; font-weight: bold; cursor: pointer; opacity: 0.7;">Test: Max Level</button>
+    <button onclick="resetAllData()" style="background: #ef4444; color: white; border: none; padding: 8px 12px; border-radius: 8px; font-weight: bold; cursor: pointer; opacity: 0.7;">Test: Reset (0 XP)</button>
+</div>
+
+<script>
+function cheatMaxLevel() {
+    Object.keys(userData.exercises).forEach(id => {
+        userData.exercises[id].unlocked = true;
+        userData.exercises[id].level = 50;
+        userData.exercises[id].stars = 5;
+        userData.exercises[id].xp = 0;
+    });
+    userData.history[new Date().toISOString().split('T')[0]] = 5000;
+    saveData();
+    renderExercises();
+    updateProfile();
+    renderAnalytics();
+}
+
+function resetAllData() {
+    localStorage.removeItem('calisthenicsQuestProData');
+    location.reload();
+}
+</script>
 </body>
 </html>
