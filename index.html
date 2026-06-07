@@ -604,11 +604,6 @@
         </div>
     </div>
 
-    <div style="position: fixed; bottom: 10px; right: 10px; z-index: 9999; display: flex; gap: 10px;">
-        <button onclick="cheatMaxLevel()" style="background: #f59e0b; color: black; border: none; padding: 8px 12px; border-radius: 8px; font-weight: bold; cursor: pointer; opacity: 0.7;">Test: Max Level</button>
-        <button onclick="resetAllData()" style="background: #ef4444; color: white; border: none; padding: 8px 12px; border-radius: 8px; font-weight: bold; cursor: pointer; opacity: 0.7;">Test: Reset (0 XP)</button>
-    </div>
-
 <script>
     const exerciseDB = [
         // PUSH (15 Übungen)
@@ -688,7 +683,6 @@
     function init() {
         loadData();
         
-        // Fügt neue Übungen dynamisch zum Profil hinzu, falls sie noch nicht existieren
         exerciseDB.forEach(ex => {
             if (!userData.exercises[ex.id]) {
                 userData.exercises[ex.id] = {
@@ -708,9 +702,11 @@
 
     function getXpNeeded(level, stars) {
         if (level < MAX_LEVEL) {
-            return Math.floor(BASE_XP * Math.pow(1.14, level - 1));
+            // Skalierung von 1.14 auf 1.10 geglättet für motivierendes, machbares Fortschreiten
+            return Math.floor(BASE_XP * Math.pow(1.10, level - 1));
         } else {
-            return 8000 * Math.pow(1.8, stars);
+            // Sterne-Skalierung von 1.8 auf 1.4 reduziert
+            return Math.floor(4000 * Math.pow(1.4, stars));
         }
     }
 
@@ -727,7 +723,20 @@
         let ex = userData.exercises[id];
         if (!ex.unlocked || (ex.level === MAX_LEVEL && ex.stars === MAX_STARS)) return;
 
-        let gainedXp = reps * 10;
+        // Finde die Übung zur Ermittlung der XP nach Schwierigkeitsgrad
+        const dbEx = exerciseDB.find(e => e.id === id);
+        let xpPerRep = 10; // Standard Fallback
+        
+        if (dbEx) {
+            switch(dbEx.diff) {
+                case 'Anfänger': xpPerRep = 5; break;
+                case 'Mittel':   xpPerRep = 15; break;
+                case 'Schwer':   xpPerRep = 40; break;
+                case 'Experte':  xpPerRep = 100; break;
+            }
+        }
+
+        let gainedXp = reps * xpPerRep;
         ex.xp += gainedXp;
         ex.totalReps += reps;
 
@@ -1002,7 +1011,27 @@
         }
     }
 
-   
+    // Die Test-Funktionen bleiben im Hintergrund der Engine erhalten, 
+    // falls du sie je über die Browser-Konsole (F12) aufrufen willst.
+    function cheatMaxLevel() {
+        Object.keys(userData.exercises).forEach(id => {
+            userData.exercises[id].unlocked = true;
+            userData.exercises[id].level = 50;
+            userData.exercises[id].stars = 5;
+            userData.exercises[id].xp = 0;
+        });
+        userData.history[new Date().toISOString().split('T')[0]] = 5000;
+        saveData();
+        renderExercises();
+        updateProfile();
+        renderAnalytics();
+    }
+
+    function resetAllData() {
+        localStorage.removeItem('calisthenicsQuestProData');
+        location.reload();
+    }
+
     window.onload = init;
 </script>
 </body>
