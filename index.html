@@ -1002,26 +1002,7 @@
         }
     }
 
-    // Cheat & Reset Funktionen für die Buttons
-    function cheatMaxLevel() {
-        Object.keys(userData.exercises).forEach(id => {
-            userData.exercises[id].unlocked = true;
-            userData.exercises[id].level = 50;
-            userData.exercises[id].stars = 5;
-            userData.exercises[id].xp = 0;
-        });
-        userData.history[new Date().toISOString().split('T')[0]] = 5000;
-        saveData();
-        renderExercises();
-        updateProfile();
-        renderAnalytics();
-    }
-
-    function resetAllData() {
-        localStorage.removeItem('calisthenicsQuestProData');
-        location.reload();
-    }
-
+   
     window.onload = init;
 </script>
 </body>
