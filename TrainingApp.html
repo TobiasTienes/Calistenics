@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calisthenics Quest</title>
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #10b981;
+            
+            /* Tier Colors */
+            --tier-locked: #334155;
+            --tier-1: #64748b; /* Level 1-9 */
+            --tier-2: #10b981; /* Level 10-19 */
+            --tier-3: #0ea5e9; /* Level 20-39 */
+            --tier-4: #a855f7; /* Level 40-49 */
+            --tier-max: #f59e0b; /* Level 50 + Stars */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        /* Header & Navigation */
+        header {
+            background-color: #0b1120;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid var(--primary);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+        }
+
+        header h1 {
+            font-size: 28px;
+            background: linear-gradient(to right, #3b82f6, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .tab-btn {
+            background: var(--bg-card);
+            border: 2px solid transparent;
+            color: var(--text-main);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            border-color: var(--primary);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Exercise Grid */
+        .exercise-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        /* Cards */
+        .card {
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 2px solid var(--tier-1);
+        }
+
+        /* Visual Tiers */
+        .card.locked { border-color: var(--tier-locked); opacity: 0.6; filter: grayscale(100%); }
+        .card.tier-1 { border-color: var(--tier-1); }
+        .card.tier-2 { border-color: var(--tier-2); box-shadow: 0 0 15px rgba(16, 185, 129, 0.2); }
+        .card.tier-3 { border-color: var(--tier-3); box-shadow: 0 0 20px rgba(14, 165, 233, 0.4); }
+        .card.tier-4 { border-color: var(--tier-4); box-shadow: 0 0 25px rgba(168, 85, 247, 0.6); }
+        .card.tier-max { 
+            border-color: var(--tier-max); 
+            box-shadow: 0 0 30px rgba(245, 158, 11, 0.8);
+            background: linear-gradient(145deg, var(--bg-card), #2d1b02);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .card-category {
+            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .card-level {
+            font-size: 24px;
+            font-weight: 900;
+            margin-bottom: 5px;
+        }
+        
+        .tier-max .card-level {
+            color: var(--tier-max);
+            text-shadow: 0 0 10px var(--tier-max);
+        }
+
+        .stars {
+            color: gold;
+            font-size: 18px;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            min-height: 20px;
+        }
+
+        /* XP Bar */
+        .xp-container {
+            width: 100%;
+            height: 10px;
+            background: #0f172a;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            overflow: hidden;
+        }
+
+        .xp-bar {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .tier-max .xp-bar { background: var(--tier-max); }
+
+        .xp-text {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: right;
+            margin-bottom: 15px;
+        }
+
+        /* Buttons */
+        .controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.1s, background 0.2s;
+            color: white;
+        }
+
+        button:active { transform: scale(0.95); }
+        
+        .btn-unlock { background: var(--accent); width: 100%; }
+        .btn-add { background: var(--primary); }
+        .btn-add:hover { background: var(--primary-hover); }
+
+        /* Profile Tab */
+        .profile-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-box {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border-top: 4px solid var(--primary);
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 10px 0;
+            color: var(--primary);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes levelUp {
+            0% { transform: scale(1); box-shadow: 0 0 0 rgba(255,255,255,0); }
+            50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(255,255,255,0.8); }
+            100% { transform: scale(1); box-shadow: 0 0 0 rgba(255,255,255,0); }
+        }
+
+        .level-up-anim {
+            animation: levelUp 0.8s ease-out;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Calisthenics Quest</h1>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('exercises')">Übungen</button>
+            <button class="tab-btn" onclick="switchTab('profile')">Profil</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div id="exercises" class="tab-content active">
+            <div class="exercise-grid" id="exercise-grid">
+                </div>
+        </div>
+
+        <div id="profile" class="tab-content">
+            <div class="profile-header">
+                <h2>Deine Athleten-Werte</h2>
+                <p style="color: var(--text-muted); margin-top: 5px;">Dein Gesamtforschritt über alle Übungen</p>
+            </div>
+            
+            <div class="profile-stats">
+                <div class="stat-box">
+                    <h3>Gesamt-Level</h3>
+                    <div class="stat-value" id="prof-total-level">0</div>
+                </div>
+                <div class="stat-box" style="border-color: #ef4444;">
+                    <h3>Push Kraft</h3>
+                    <div class="stat-value" id="prof-push" style="color: #ef4444;">0</div>
+                </div>
+                <div class="stat-box" style="border-color: #3b82f6;">
+                    <h3>Pull Kraft</h3>
+                    <div class="stat-value" id="prof-pull">0</div>
+                </div>
+                <div class="stat-box" style="border-color: #eab308;">
+                    <h3>Core Stabilität</h3>
+                    <div class="stat-value" id="prof-core" style="color: #eab308;">0</div>
+                </div>
+                <div class="stat-box" style="border-color: #10b981;">
+                    <h3>Bein Kraft</h3>
+                    <div class="stat-value" id="prof-legs" style="color: #10b981;">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // 32 Calisthenics Exercises
+    const exerciseDB = [
+        // PUSH
+        { id: 'p1', name: 'Wand-Liegestütze', cat: 'Push', diff: 'Anfänger' },
+        { id: 'p2', name: 'Knie-Liegestütze', cat: 'Push', diff: 'Anfänger' },
+        { id: 'p3', name: 'Liegestütze', cat: 'Push', diff: 'Mittel' },
+        { id: 'p4', name: 'Breite Liegestütze', cat: 'Push', diff: 'Mittel' },
+        { id: 'p5', name: 'Diamant Liegestütze', cat: 'Push', diff: 'Mittel' },
+        { id: 'p6', name: 'Pike Push-ups', cat: 'Push', diff: 'Mittel' },
+        { id: 'p7', name: 'Dips (Bank)', cat: 'Push', diff: 'Anfänger' },
+        { id: 'p8', name: 'Dips (Barren)', cat: 'Push', diff: 'Schwer' },
+        { id: 'p9', name: 'Handstand Push-up (Wand)', cat: 'Push', diff: 'Schwer' },
+        { id: 'p10', name: 'Planche Lean', cat: 'Push', diff: 'Schwer' },
+        
+        // PULL
+        { id: 'pu1', name: 'Australian Pull-ups', cat: 'Pull', diff: 'Anfänger' },
+        { id: 'pu2', name: 'Dead Hang (Sek.)', cat: 'Pull', diff: 'Anfänger' },
+        { id: 'pu3', name: 'Klimmzüge (Untergriff)', cat: 'Pull', diff: 'Mittel' },
+        { id: 'pu4', name: 'Klimmzüge (Obergriff)', cat: 'Pull', diff: 'Mittel' },
+        { id: 'pu5', name: 'Breite Klimmzüge', cat: 'Pull', diff: 'Schwer' },
+        { id: 'pu6', name: 'L-Sit Klimmzüge', cat: 'Pull', diff: 'Schwer' },
+        { id: 'pu7', name: 'Archer Pull-ups', cat: 'Pull', diff: 'Experte' },
+        { id: 'pu8', name: 'Muscle-Up (Band)', cat: 'Pull', diff: 'Schwer' },
+        { id: 'pu9', name: 'Muscle-Up', cat: 'Pull', diff: 'Experte' },
+        { id: 'pu10', name: 'Front Lever Tuck', cat: 'Pull', diff: 'Schwer' },
+
+        // CORE
+        { id: 'c1', name: 'Plank (Sek.)', cat: 'Core', diff: 'Anfänger' },
+        { id: 'c2', name: 'Crunches', cat: 'Core', diff: 'Anfänger' },
+        { id: 'c3', name: 'Hollow Body Hold (Sek.)', cat: 'Core', diff: 'Mittel' },
+        { id: 'c4', name: 'Beinheben liegend', cat: 'Core', diff: 'Mittel' },
+        { id: 'c5', name: 'Beinheben hängend', cat: 'Core', diff: 'Schwer' },
+        { id: 'c6', name: 'L-Sit (Sek.)', cat: 'Core', diff: 'Schwer' },
+        { id: 'c7', name: 'Dragon Flag Tuck', cat: 'Core', diff: 'Schwer' },
+        { id: 'c8', name: 'Dragon Flag', cat: 'Core', diff: 'Experte' },
+
+        // LEGS
+        { id: 'l1', name: 'Kniebeugen (Squats)', cat: 'Legs', diff: 'Anfänger' },
+        { id: 'l2', name: 'Ausfallschritte (Lunges)', cat: 'Legs', diff: 'Anfänger' },
+        { id: 'l3', name: 'Wadenheben', cat: 'Legs', diff: 'Anfänger' },
+        { id: 'l4', name: 'Jump Squats', cat: 'Legs', diff: 'Mittel' },
+        { id: 'l5', name: 'Bulgarian Split Squats', cat: 'Legs', diff: 'Mittel' },
+        { id: 'l6', name: 'Pistol Squats (Assistiert)', cat: 'Legs', diff: 'Schwer' },
+        { id: 'l7', name: 'Pistol Squats', cat: 'Legs', diff: 'Experte' },
+    ];
+
+    // User Data State
+    let userData = {};
+
+    const MAX_LEVEL = 50;
+    const MAX_STARS = 5;
+    const BASE_XP = 100;
+    // XP needed = BASE_XP * (1.10 ^ (level - 1))
+    // For stars (after level 50): huge jump. Star 1 needs 20000, Star 2 needs 40000 etc.
+
+    function init() {
+        loadData();
+        // Initialize missing exercises in userData
+        exerciseDB.forEach(ex => {
+            if (!userData[ex.id]) {
+                userData[ex.id] = {
+                    unlocked: false,
+                    level: 1,
+                    xp: 0,
+                    stars: 0,
+                    totalReps: 0
+                };
+            }
+        });
+        renderExercises();
+        updateProfile();
+    }
+
+    // --- LOGIC ---
+
+    function getXpNeeded(level, stars) {
+        if (level < MAX_LEVEL) {
+            return Math.floor(BASE_XP * Math.pow(1.15, level - 1));
+        } else {
+            // Very hard to get stars
+            return 10000 * Math.pow(2, stars); 
+        }
+    }
+
+    function unlock(id) {
+        userData[id].unlocked = true;
+        saveData();
+        renderExercises();
+        updateProfile();
+    }
+
+    function addReps(id, reps) {
+        let ex = userData[id];
+        if (!ex.unlocked) return;
+        if (ex.level === MAX_LEVEL && ex.stars === MAX_STARS) return; // Completely maxed out
+
+        // Let's say 1 Rep = 10 XP
+        let gainedXp = reps * 10;
+        ex.xp += gainedXp;
+        ex.totalReps += reps;
+
+        checkLevelUp(id);
+        saveData();
+        updateCard(id);
+        updateProfile();
+    }
+
+    function checkLevelUp(id) {
+        let ex = userData[id];
+        let leveledUp = false;
+
+        while (true) {
+            if (ex.level === MAX_LEVEL && ex.stars === MAX_STARS) {
+                ex.xp = getXpNeeded(MAX_LEVEL, MAX_STARS); // Cap visual XP
+                break;
+            }
+
+            let needed = getXpNeeded(ex.level, ex.stars);
+            if (ex.xp >= needed) {
+                ex.xp -= needed;
+                leveledUp = true;
+                
+                if (ex.level < MAX_LEVEL) {
+                    ex.level++;
+                } else {
+                    ex.stars++;
+                }
+            } else {
+                break;
+            }
+        }
+
+        if (leveledUp) {
+            triggerLevelUpAnimation(id);
+        }
+    }
+
+    // --- VISUALS & RENDER ---
+
+    function getTierClass(level, stars) {
+        if (stars > 0 || level === MAX_LEVEL) return 'tier-max';
+        if (level >= 40) return 'tier-4';
+        if (level >= 20) return 'tier-3';
+        if (level >= 10) return 'tier-2';
+        return 'tier-1';
+    }
+
+    function generateStarsHTML(stars) {
+        if (stars === 0) return '<div class="stars"></div>';
+        return '<div class="stars">' + '★'.repeat(stars) + '</div>';
+    }
+
+    function renderExercises() {
+        const grid = document.getElementById('exercise-grid');
+        grid.innerHTML = '';
+
+        exerciseDB.forEach(dbEx => {
+            let userEx = userData[dbEx.id];
+            let isMaxed = userEx.level === MAX_LEVEL && userEx.stars === MAX_STARS;
+            let neededXp = getXpNeeded(userEx.level, userEx.stars);
+            let progressPct = isMaxed ? 100 : Math.min(100, (userEx.xp / neededXp) * 100);
+            
+            let cardClass = userEx.unlocked ? getTierClass(userEx.level, userEx.stars) : 'locked';
+            
+            let html = `
+                <div class="card ${cardClass}" id="card-${dbEx.id}">
+                    <div class="card-header">
+                        <span class="card-category">${dbEx.cat}</span>
+                        <span style="font-size: 12px; color: var(--text-muted);">${dbEx.diff}</span>
+                    </div>
+                    <div class="card-title">${dbEx.name}</div>
+            `;
+
+            if (!userEx.unlocked) {
+                html += `
+                    <div style="margin-top: 30px;">
+                        <button class="btn-unlock" onclick="unlock('${dbEx.id}')">🔓 Freischalten (1 Wdh geschafft)</button>
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div class="card-level">LVL ${userEx.level}</div>
+                    ${generateStarsHTML(userEx.stars)}
+                    <div class="xp-container">
+                        <div class="xp-bar" style="width: ${progressPct}%"></div>
+                    </div>
+                    <div class="xp-text">${isMaxed ? 'MAXIMALES LEVEL!' : Math.floor(userEx.xp) + ' / ' + neededXp + ' XP'}</div>
+                    <div class="controls">
+                        <button class="btn-add" onclick="addReps('${dbEx.id}', 1)" ${isMaxed ? 'disabled' : ''}>+1 Wdh</button>
+                        <button class="btn-add" onclick="addReps('${dbEx.id}', 10)" ${isMaxed ? 'disabled' : ''}>+10 Wdh</button>
+                    </div>
+                `;
+            }
+
+            html += `</div>`;
+            grid.innerHTML += html;
+        });
+    }
+
+    function updateCard(id) {
+        // Instead of re-rendering the whole grid, just re-render the specific card
+        // For simplicity in this script, we re-render everything, but you could target DOM nodes for better performance.
+        renderExercises(); 
+    }
+
+    function triggerLevelUpAnimation(id) {
+        setTimeout(() => {
+            const card = document.getElementById(`card-${id}`);
+            if (card) {
+                card.classList.add('level-up-anim');
+                setTimeout(() => card.classList.remove('level-up-anim'), 800);
+            }
+        }, 100);
+    }
+
+    function updateProfile() {
+        let totalLevel = 0;
+        let stats = { Push: 0, Pull: 0, Core: 0, Legs: 0 };
+
+        exerciseDB.forEach(ex => {
+            let uEx = userData[ex.id];
+            if (uEx.unlocked) {
+                totalLevel += uEx.level;
+                // Add bonus levels for stars
+                let effectiveLevel = uEx.level + (uEx.stars * 10); 
+                stats[ex.cat] += effectiveLevel;
+            }
+        });
+
+        document.getElementById('prof-total-level').innerText = totalLevel;
+        document.getElementById('prof-push').innerText = stats.Push;
+        document.getElementById('prof-pull').innerText = stats.Pull;
+        document.getElementById('prof-core').innerText = stats.Core;
+        document.getElementById('prof-legs').innerText = stats.Legs;
+    }
+
+    // --- UTILS ---
+
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        
+        document.getElementById(tabId).classList.add('active');
+        event.target.classList.add('active');
+    }
+
+    function saveData() {
+        localStorage.setItem('calisthenicsQuestData', JSON.stringify(userData));
+    }
+
+    function loadData() {
+        let saved = localStorage.getItem('calisthenicsQuestData');
+        if (saved) {
+            userData = JSON.parse(saved);
+        }
+    }
+
+    // Start App
+    window.onload = init;
+
+</script>
+</body>
+</html>
