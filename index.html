@@ -3,25 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calisthenics Quest Pro</title>
+    <title>Calisthenics Quest Ultra</title>
     <style>
         :root {
-            --bg-dark: #0b0f19;
-            --bg-card: #151f32;
-            --bg-input: #0f172a;
+            --bg-dark: #05070f;
+            --bg-card: #0c1122;
+            --bg-input: #03050a;
             --primary: #3b82f6;
-            --primary-hover: #2563eb;
+            --primary-glow: rgba(59, 130, 246, 0.5);
             --text-main: #f8fafc;
-            --text-muted: #64748b;
+            --text-muted: #475569;
             --accent: #10b981;
+            --accent-glow: rgba(16, 185, 129, 0.5);
             
-            /* Tier Colors for Visual Progression */
-            --tier-locked: #1e293b;
-            --tier-1: #475569; /* Lvl 1-9 */
-            --tier-2: #10b981; /* Lvl 10-19 */
-            --tier-3: #0ea5e9; /* Lvl 20-39 */
-            --tier-4: #a855f7; /* Lvl 40-49 */
-            --tier-max: #f59e0b; /* Lvl 50 + Stars */
+            /* Tier Level Glows */
+            --tier-locked: rgba(30, 41, 59, 0.3);
+            --tier-1: #475569;
+            --tier-2: #10b981;
+            --tier-3: #0ea5e9;
+            --tier-4: #a855f7;
+            --tier-max: #f59e0b;
         }
 
         * {
@@ -36,310 +37,359 @@
             background-color: var(--bg-dark);
             color: var(--text-main);
             min-height: 100vh;
-            padding-bottom: 40px;
+            padding-bottom: 50px;
+            overflow-x: hidden;
         }
 
-        /* App Header & Navigation */
+        /* Neon-Header & Navigation */
         header {
-            background-color: #070a12;
-            padding: 20px 15px;
+            background: linear-gradient(to bottom, #070b18, #05070f);
+            padding: 25px 15px;
             text-align: center;
-            border-bottom: 1px solid #1e293b;
+            border-bottom: 1px solid rgba(5b, 130, 246, 0.2);
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.7);
         }
 
         header h1 {
-            font-size: 24px;
-            font-weight: 800;
-            background: linear-gradient(to right, #3b82f6, #10b981, #a855f7);
+            font-size: 28px;
+            font-weight: 900;
+            background: linear-gradient(to right, #3b82f6, #10b981, #ff007f);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 15px;
-            letter-spacing: 1px;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            filter: drop-shadow(0 0 10px rgba(5b, 130, 246, 0.3));
         }
 
         .tabs {
             display: flex;
             justify-content: center;
-            gap: 8px;
-            max-width: 500px;
+            gap: 12px;
+            max-width: 600px;
             margin: 0 auto;
         }
 
         .tab-btn {
             flex: 1;
-            background: var(--bg-card);
-            border: 1px solid #1e293b;
-            color: var(--text-muted);
-            padding: 10px 5px;
-            border-radius: 10px;
+            background: rgba(12, 17, 34, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: #64748b;
+            padding: 12px 5px;
+            border-radius: 12px;
             cursor: pointer;
-            font-weight: 600;
-            font-size: 13px;
-            transition: all 0.25s ease;
+            font-weight: 700;
+            font-size: 14px;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .tab-btn:hover {
+            color: var(--text-main);
+            border-color: rgba(5b, 130, 246, 0.3);
+            background: rgba(59, 130, 246, 0.05);
         }
 
         .tab-btn.active {
             border-color: var(--primary);
             color: var(--text-main);
             background: rgba(59, 130, 246, 0.15);
-            box-shadow: 0 0 12px rgba(59, 130, 246, 0.2);
+            box-shadow: 0 0 20px var(--primary-glow);
+            transform: translateY(-2px);
         }
 
-        /* Main Container */
+        /* Container & Grid */
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px 15px;
+            padding: 30px 15px;
         }
 
         .tab-content {
             display: none;
-            animation: tabFadeIn 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: tabSliceIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .tab-content.active {
             display: block;
         }
 
-        /* Exercise Tab Styles */
         .exercise-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 25px;
         }
 
+        /* Gamified Cards */
         .card {
-            background-color: var(--bg-card);
-            border-radius: 16px;
-            padding: 20px;
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 24px;
             position: relative;
             overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 2px solid var(--tier-1);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            border: 1px solid rgba(255, 255, 255, 0.03);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            min-height: 240px;
+            min-height: 260px;
         }
 
-        /* Dynamic Visual Levels (Glow & Background Styles) */
+        .card:hover:not(.locked) {
+            transform: translateY(-5px) scale(1.02);
+        }
+
+        /* Visual Tier Level Ups */
         .card.locked { 
             border-color: var(--tier-locked); 
-            background-color: rgba(21, 31, 50, 0.4);
-            opacity: 0.5; 
+            background: rgba(5, 7, 15, 0.8);
+            opacity: 0.4;
+            filter: grayscale(80%);
         }
-        .card.tier-1 { border-color: var(--tier-1); }
-        .card.tier-2 { border-color: var(--tier-2); box-shadow: 0 0 15px rgba(16, 185, 129, 0.15); }
-        .card.tier-3 { border-color: var(--tier-3); box-shadow: 0 0 20px rgba(14, 165, 233, 0.3); }
-        .card.tier-4 { border-color: var(--tier-4); box-shadow: 0 0 25px rgba(168, 85, 247, 0.45); }
+        .card.tier-1 { border-color: rgba(71, 85, 105, 0.4); }
+        .card.tier-2 { border-color: var(--tier-2); box-shadow: inset 0 0 15px rgba(16, 185, 129, 0.05), 0 5px 15px rgba(16, 185, 129, 0.1); }
+        .card.tier-3 { border-color: var(--tier-3); box-shadow: inset 0 0 20px rgba(14, 165, 233, 0.1), 0 8px 25px rgba(14, 165, 233, 0.2); }
+        .card.tier-4 { border-color: var(--tier-4); box-shadow: inset 0 0 25px rgba(168, 85, 247, 0.15), 0 10px 30px rgba(168, 85, 247, 0.3); }
         .card.tier-max { 
             border-color: var(--tier-max); 
-            box-shadow: 0 0 35px rgba(245, 158, 11, 0.6);
-            background: linear-gradient(135deg, var(--bg-card) 0%, #291a03 100%);
+            box-shadow: inset 0 0 30px rgba(245, 158, 11, 0.2), 0 15px 40px rgba(245, 158, 11, 0.4);
+            background: linear-gradient(135deg, var(--bg-card) 0%, #1a1102 100%);
         }
 
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
         }
 
         .card-category {
-            font-size: 11px;
+            font-size: 10px;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            padding: 3px 8px;
-            border-radius: 20px;
-            background: rgba(255,255,255,0.06);
-            font-weight: bold;
+            letter-spacing: 1.5px;
+            padding: 4px 10px;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            font-weight: 800;
+            color: #94a3b8;
         }
 
         .card-diff {
             font-size: 11px;
-            color: var(--text-muted);
+            color: #475569;
+            font-weight: 600;
         }
 
         .card-title {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 12px;
-            line-height: 1.3;
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 15px;
+            letter-spacing: -0.3px;
         }
 
         .card-level {
-            font-size: 26px;
+            font-size: 28px;
             font-weight: 900;
-            margin-bottom: 2px;
-            letter-spacing: -0.5px;
+            font-style: italic;
+            letter-spacing: -1px;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         
         .tier-max .card-level {
-            color: var(--tier-max);
-            text-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+            background: linear-gradient(to right, #f59e0b, #fef08a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.6));
         }
 
         .stars {
-            color: #fbbf24;
+            color: #f59e0b;
             font-size: 16px;
-            letter-spacing: 2px;
-            margin-bottom: 12px;
+            letter-spacing: 4px;
+            margin-bottom: 15px;
             min-height: 20px;
+            filter: drop-shadow(0 0 5px rgba(245, 158, 11, 0.5));
         }
 
-        /* Progress Bar */
+        /* Progress Bar (Smooth & Shiny) */
         .xp-container {
             width: 100%;
-            height: 8px;
+            height: 10px;
             background: var(--bg-input);
-            border-radius: 10px;
-            margin-bottom: 4px;
+            border-radius: 20px;
+            margin-bottom: 6px;
             overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.02);
         }
 
         .xp-bar {
             height: 100%;
-            background: linear-gradient(to right, var(--primary), #60a5fa);
+            background: linear-gradient(to right, #3b82f6, #06b6d4);
             width: 0%;
-            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 20px;
+            transition: width 0.5s cubic-bezier(0.1, 0.8, 0.2, 1);
+            position: relative;
+        }
+
+        .xp-bar::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to right, rgba(255,255,255,0), rgba(255,255,255,0.2), rgba(255,255,255,0));
+            animation: barShine 2s infinite linear;
         }
         
-        .tier-max .xp-bar { background: linear-gradient(to right, var(--tier-max), #fcd34d); }
+        .tier-max .xp-bar { background: linear-gradient(to right, #f59e0b, #fcd34d); }
 
         .xp-text {
             font-size: 11px;
-            color: var(--text-muted);
+            color: #64748b;
             text-align: right;
-            margin-bottom: 15px;
-            font-weight: 600;
+            margin-bottom: 18px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
         }
 
-        /* Action Controls */
+        /* Premium Buttons */
         .controls {
             display: flex;
-            gap: 8px;
+            gap: 10px;
         }
 
         button.action-btn {
             flex: 1;
-            padding: 10px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 700;
+            padding: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px;
+            font-weight: 800;
             font-size: 13px;
             cursor: pointer;
-            transition: transform 0.1s active, background 0.2s;
             color: white;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        button.action-btn:active { transform: scale(0.95); }
+        .btn-unlock { 
+            background: linear-gradient(135deg, var(--accent) 0%, #059669 100%); 
+            width: 100%; 
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+        .btn-unlock:hover { box-shadow: 0 6px 20px rgba(16, 185, 129, 0.7); transform: translateY(-1px); }
         
-        .btn-unlock { background: var(--accent); width: 100%; }
-        .btn-add { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); color: var(--text-main); }
-        .btn-add:hover { background: rgba(255,255,255,0.15); }
+        .btn-add { 
+            background: rgba(255, 255, 255, 0.03); 
+            color: #f1f5f9;
+        }
+        .btn-add:hover { 
+            background: rgba(59, 130, 246, 0.15); 
+            border-color: var(--primary);
+            text-shadow: 0 0 5px #fff;
+            transform: scale(1.03);
+        }
+        .btn-add:active { transform: scale(0.95); }
 
-        /* Profile Tab Styles */
+        /* Profile Styles */
         .profile-header {
             text-align: center;
-            margin-bottom: 30px;
-            background: var(--bg-card);
-            padding: 30px;
-            border-radius: 20px;
-            border: 1px solid #1e293b;
+            margin-bottom: 40px;
+            background: radial-gradient(circle at top, #111a33 0%, var(--bg-card) 100%);
+            padding: 40px;
+            border-radius: 24px;
+            border: 1px solid rgba(5b, 130, 246, 0.15);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
         }
 
-        .profile-header h2 { font-size: 28px; font-weight: 800; }
+        .profile-header h2 { font-size: 36px; font-weight: 900; letter-spacing: -1px; margin-bottom: 5px; }
 
         .profile-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
         }
 
         .stat-card {
             background: var(--bg-card);
-            padding: 24px;
-            border-radius: 16px;
-            border: 1px solid #1e293b;
+            padding: 30px 20px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.02);
             text-align: center;
             position: relative;
+            transition: transform 0.3s;
         }
+        .stat-card:hover { transform: translateY(-3px); }
 
         .stat-card::before {
             content: '';
             position: absolute;
-            top: 0; left: 0; right: 0; height: 5px;
-            border-radius: 16px 16px 0 0;
+            top: 0; left: 0; right: 0; height: 4px;
+            border-radius: 20px 20px 0 0;
         }
-        .stat-card.push::before { background: #ef4444; }
-        .stat-card.pull::before { background: #3b82f6; }
-        .stat-card.core::before { background: #eab308; }
-        .stat-card.legs::before { background: #10b981; }
+        .stat-card.push::before { background: #ef4444; box-shadow: 0 2px 10px rgba(239, 68, 68, 0.5); }
+        .stat-card.pull::before { background: #3b82f6; box-shadow: 0 2px 10px rgba(59, 130, 246, 0.5); }
+        .stat-card.core::before { background: #eab308; box-shadow: 0 2px 10px rgba(234, 179, 8, 0.5); }
+        .stat-card.legs::before { background: #10b981; box-shadow: 0 2px 10px rgba(16, 185, 129, 0.5); }
 
-        .stat-title { font-size: 14px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; font-weight: bold;}
-        .stat-value { font-size: 36px; font-weight: 900; margin: 10px 0; }
-        .stat-meta { font-size: 12px; color: var(--text-muted); }
+        .stat-title { font-size: 13px; text-transform: uppercase; color: #64748b; letter-spacing: 1.5px; font-weight: 800;}
+        .stat-value { font-size: 42px; font-weight: 900; margin: 12px 0; letter-spacing: -1px; }
+        .stat-meta { font-size: 12px; color: #475569; font-weight: 600; }
 
-        /* Statistics / Graph Tab Styles */
+        /* Analytics / Custom SVG Bar Chart Styles */
         .stats-control-panel {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 20px;
         }
 
         .time-filter-group {
             display: flex;
             background: var(--bg-input);
-            padding: 4px;
-            border-radius: 10px;
-            border: 1px solid #1e293b;
+            padding: 5px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.05);
         }
 
         .filter-btn {
             background: transparent;
             border: none;
-            color: var(--text-muted);
-            padding: 6px 14px;
-            font-size: 12px;
-            font-weight: 700;
-            border-radius: 8px;
+            color: #475569;
+            padding: 8px 18px;
+            font-size: 13px;
+            font-weight: 800;
+            border-radius: 10px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s;
         }
 
         .filter-btn.active {
             background: var(--bg-card);
             color: var(--text-main);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4), 0 0 10px rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(255,255,255,0.03);
         }
 
         .chart-wrapper {
             background: var(--bg-card);
-            border-radius: 20px;
-            padding: 24px;
-            border: 1px solid #1e293b;
-            margin-bottom: 25px;
-        }
-
-        .chart-header-info {
-            margin-bottom: 20px;
+            border-radius: 24px;
+            padding: 30px;
+            border: 1px solid rgba(255,255,255,0.02);
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
 
         .chart-container {
             display: flex;
             align-items: flex-end;
             justify-content: space-between;
-            height: 280px;
-            padding-top: 20px;
+            height: 300px;
+            padding-top: 35px;
             position: relative;
-            border-bottom: 2px solid #1e293b;
+            border-bottom: 2px solid rgba(255,255,255,0.05);
         }
 
         .chart-bar-axis {
@@ -347,15 +397,16 @@
             flex-direction: column;
             justify-content: space-between;
             position: absolute;
-            left: 0; top: 20px; bottom: 0;
-            color: rgba(255,255,255,0.15);
-            font-size: 10px;
+            left: 0; top: 35px; bottom: 0;
+            color: rgba(255,255,255,0.1);
+            font-size: 11px;
+            font-weight: 700;
             width: 100%;
             pointer-events: none;
         }
 
         .axis-line {
-            border-top: 1px dashed rgba(255,255,255,0.05);
+            border-top: 1px dashed rgba(255,255,255,0.03);
             width: 100%;
             height: 0;
         }
@@ -369,97 +420,104 @@
             justify-content: flex-end;
             position: relative;
             z-index: 2;
-            margin: 0 2px;
+            margin: 0 4px;
         }
 
         .bar {
-            width: 70%;
-            max-width: 35px;
-            background: linear-gradient(to top, var(--primary), #60a5fa);
-            border-radius: 6px 6px 0 0;
+            width: 75%;
+            max-width: 32px;
+            background: linear-gradient(to top, #1d4ed8, #60a5fa);
+            border-radius: 8px 8px 0 0;
             min-height: 2px;
-            transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: height 0.8s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
         }
 
         .bar:hover {
-            background: linear-gradient(to top, var(--accent), #34d399);
-            box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+            background: linear-gradient(to top, #059669, #34d399);
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.6);
         }
 
         .bar:hover .tooltip {
             opacity: 1;
             visibility: visible;
-            transform: translate(-50%, -8px);
+            transform: translate(-50%, -12px);
         }
 
         .tooltip {
             position: absolute;
-            top: -40px;
+            top: -45px;
             left: 50%;
             transform: translate(-50%, 0);
-            background: #070a12;
+            background: #03050a;
             color: #fff;
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: bold;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 800;
             white-space: nowrap;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            border: 1px solid #1e293b;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.08);
             opacity: 0;
             visibility: hidden;
-            transition: all 0.2s ease;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
             z-index: 10;
         }
 
         .bar-label {
-            font-size: 10px;
-            color: var(--text-muted);
-            margin-top: 8px;
-            text-align: center;
-            max-width: 100%;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            font-size: 11px;
+            color: #475569;
+            margin-top: 10px;
+            font-weight: 700;
         }
 
         .stats-summary-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
         }
 
         .summary-box {
             background: var(--bg-input);
-            padding: 15px;
-            border-radius: 12px;
-            border: 1px solid #1e293b;
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.03);
+            transition: border 0.3s;
         }
-        .summary-box p { font-size: 12px; color: var(--text-muted); font-weight: 600;}
-        .summary-box h4 { font-size: 20px; font-weight: 800; margin-top: 5px; color: var(--primary); }
+        .summary-box:hover { border-color: rgba(5b, 130, 246, 0.2); }
+        .summary-box p { font-size: 12px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;}
+        .summary-box h4 { font-size: 24px; font-weight: 900; margin-top: 8px; color: var(--primary); }
 
-        /* Animations */
-        @keyframes tabFadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes lvlUpPulse {
-            0% { transform: scale(1); border-color: #fff; box-shadow: 0 0 0 0px rgba(255,255,255,0.7); }
-            50% { transform: scale(1.03); border-color: var(--accent); box-shadow: 0 0 25px 10px rgba(16, 185, 129, 0); }
-            100% { transform: scale(1); }
+        /* Complex Animations */
+        @keyframes tabSliceIn {
+            from { opacity: 0; transform: translateY(15px); filter: blur(4px); }
+            to { opacity: 1; transform: translateY(0); filter: blur(0); }
         }
 
-        .animate-lvlup {
-            animation: lvlUpPulse 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+        @keyframes barShine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        @keyframes ultraLevelUp {
+            0% { transform: scale(1); filter: brightness(1); }
+            20% { transform: scale(1.05); filter: brightness(1.8); border-color: #fff; box-shadow: 0 0 40px #fff; }
+            40% { transform: scale(0.97) rotate(1deg); }
+            60% { transform: scale(1.02) rotate(-1deg); box-shadow: 0 0 30px var(--accent); }
+            100% { transform: scale(1); filter: brightness(1); }
+        }
+
+        .animate-levelup-epic {
+            animation: ultraLevelUp 0.7s cubic-bezier(0.25, 1, 0.5, 1) !important;
+            z-index: 50;
         }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>Calisthenics Quest Pro</h1>
+        <h1>CALISTHENICS QUEST</h1>
         <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('exercises', this)">Übungen</button>
             <button class="tab-btn" onclick="switchTab('profile', this)">Profil</button>
@@ -474,35 +532,35 @@
 
         <div id="profile" class="tab-content">
             <div class="profile-header">
-                <p style="text-transform: uppercase; font-size: 11px; letter-spacing: 2px; color: var(--primary); font-weight: bold;">Gesamt-Fortschritt</p>
+                <p style="text-transform: uppercase; font-size: 12px; letter-spacing: 3px; color: var(--primary); font-weight: 900;">Gesamte Kampfkraft</p>
                 <h2 id="prof-total-level">Level 0</h2>
-                <p style="color: var(--text-muted); font-size: 13px; margin-top: 5px;">Nicht begonnene Übungen verschlechtern deine Werte nicht.</p>
+                <p style="color: #475569; font-size: 14px; margin-top: 5px; font-weight: 600;">Ignorierte Übungen mindern deine Statistiken nicht.</p>
             </div>
             
             <div class="profile-grid">
                 <div class="stat-card push">
-                    <span class="stat-title">Push Kraft</span>
-                    <div class="stat-value" id="prof-push">Lvl 0</div>
+                    <span class="stat-title">Push Power</span>
+                    <div class="stat-value" id="prof-push" style="color: #ef4444;">Lvl 0</div>
                     <div class="stars" id="stars-push"></div>
-                    <span class="stat-meta" id="meta-push">0 Übungen aktiv</span>
+                    <span class="stat-meta" id="meta-push">0 aktiv</span>
                 </div>
                 <div class="stat-card pull">
-                    <span class="stat-title">Pull Kraft</span>
-                    <div class="stat-value" id="prof-pull">Lvl 0</div>
+                    <span class="stat-title">Pull Power</span>
+                    <div class="stat-value" id="prof-pull" style="color: #3b82f6;">Lvl 0</div>
                     <div class="stars" id="stars-pull"></div>
-                    <span class="stat-meta" id="meta-pull">0 Übungen aktiv</span>
+                    <span class="stat-meta" id="meta-pull">0 aktiv</span>
                 </div>
                 <div class="stat-card core">
-                    <span class="stat-title">Core Stabilität</span>
-                    <div class="stat-value" id="prof-core">Lvl 0</div>
+                    <span class="stat-title">Core Control</span>
+                    <div class="stat-value" id="prof-core" style="color: #eab308;">Lvl 0</div>
                     <div class="stars" id="stars-core"></div>
-                    <span class="stat-meta" id="meta-core">0 Übungen aktiv</span>
+                    <span class="stat-meta" id="meta-core">0 aktiv</span>
                 </div>
                 <div class="stat-card legs">
-                    <span class="stat-title">Bein Kraft</span>
-                    <div class="stat-value" id="prof-legs">Lvl 0</div>
+                    <span class="stat-title">Leg Destructor</span>
+                    <div class="stat-value" id="prof-legs" style="color: #10b981;">Lvl 0</div>
                     <div class="stars" id="stars-legs"></div>
-                    <span class="stat-meta" id="meta-legs">0 Übungen aktiv</span>
+                    <span class="stat-meta" id="meta-legs">0 aktiv</span>
                 </div>
             </div>
         </div>
@@ -510,8 +568,8 @@
         <div id="analytics" class="tab-content">
             <div class="stats-control-panel">
                 <div>
-                    <h2>Aktivitäts-Graph</h2>
-                    <p style="color: var(--text-muted); font-size: 13px;">Deine gesammelten XP im zeitlichen Verlauf</p>
+                    <h2>Aktivitäts-Timeline</h2>
+                    <p style="color: #475569; font-size: 14px; font-weight: 600;">Echtzeit-Tracking deiner Trainings-Energie</p>
                 </div>
                 <div class="time-filter-group">
                     <button class="filter-btn active" onclick="changeTimeFilter('week', this)">Woche</button>
@@ -523,23 +581,22 @@
 
             <div class="chart-wrapper">
                 <div class="chart-header-info">
-                    <span id="chart-view-title" style="font-weight: bold; font-size: 14px; color: var(--text-muted);">Letzte 7 Tage</span>
+                    <span id="chart-view-title" style="font-weight: 800; font-size: 14px; color: #64748b; text-transform: uppercase;">Letzte 7 Tage</span>
                 </div>
-                <div class="chart-container" id="chart-bars-container">
-                    </div>
+                <div class="chart-container" id="chart-bars-container"></div>
             </div>
 
             <div class="stats-summary-grid">
                 <div class="summary-box">
-                    <p>Gesamt gesammelte XP</p>
+                    <p>Gesamte XP</p>
                     <h4 id="sum-total-xp">0 XP</h4>
                 </div>
                 <div class="summary-box">
-                    <p>Heutige Ausbeute</p>
+                    <p>Heutige XP</p>
                     <h4 id="sum-today-xp">0 XP</h4>
                 </div>
                 <div class="summary-box">
-                    <p>Aktivste Kategorie</p>
+                    <p>Fokus-Zone</p>
                     <h4 id="sum-top-cat">-</h4>
                 </div>
             </div>
@@ -547,7 +604,6 @@
     </div>
 
 <script>
-    // Database of 32 Calisthenics Exercises
     const exerciseDB = [
         // PUSH
         { id: 'p1', name: 'Wand-Liegestütze', cat: 'Push', diff: 'Anfänger' },
@@ -593,10 +649,9 @@
         { id: 'l7', name: 'Pistol Squats', cat: 'Legs', diff: 'Experte' },
     ];
 
-    // Main App State Object
     let userData = {
         exercises: {},
-        history: {} // Format: 'YYYY-MM-DD': xpAmount
+        history: {}
     };
 
     const MAX_LEVEL = 50;
@@ -607,7 +662,6 @@
     function init() {
         loadData();
         
-        // Setup default objects for exercises if missing
         exerciseDB.forEach(ex => {
             if (!userData.exercises[ex.id]) {
                 userData.exercises[ex.id] = {
@@ -620,32 +674,25 @@
             }
         });
 
-        // Seed mock history data for the graph if fresh user profile
-        if (Object.keys(userData.history).length === 0) {
-            generateDemoHistory();
-        }
+        // HINWEIS: Hier gab es früher eine Demo-Funktion. Sie wurde komplett entfernt!
+        // Die App startet jetzt absolut sauber bei 0 XP.
 
         renderExercises();
         updateProfile();
         renderAnalytics();
     }
 
-    // --- GAME MECHANICS ---
-
     function getXpNeeded(level, stars) {
         if (level < MAX_LEVEL) {
             return Math.floor(BASE_XP * Math.pow(1.14, level - 1));
         } else {
-            return 8000 * Math.pow(1.8, stars); // Hard wall for star prestige
+            return 8000 * Math.pow(1.8, stars);
         }
     }
 
     function unlock(id) {
         userData.exercises[id].unlocked = true;
-        
-        // Log a small reward of 50 XP to the history timeline for unlocking
-        trackXpGain(50);
-        
+        trackXpGain(50); // Kleiner XP Boost fürs Freischalten
         saveData();
         renderExercises();
         updateProfile();
@@ -656,7 +703,7 @@
         let ex = userData.exercises[id];
         if (!ex.unlocked || (ex.level === MAX_LEVEL && ex.stars === MAX_STARS)) return;
 
-        let gainedXp = reps * 10; // 1 rep = 10 xp
+        let gainedXp = reps * 10;
         ex.xp += gainedXp;
         ex.totalReps += reps;
 
@@ -703,8 +750,6 @@
             triggerVisualLevelUp(id);
         }
     }
-
-    // --- INTERFACE RENDERING ---
 
     function getTierClass(level, stars) {
         if (stars > 0 || level === MAX_LEVEL) return 'tier-max';
@@ -768,13 +813,11 @@
         setTimeout(() => {
             const card = document.getElementById(`card-${id}`);
             if (card) {
-                card.classList.add('animate-lvlup');
-                setTimeout(() => card.classList.remove('animate-lvlup'), 600);
+                card.classList.add('animate-levelup-epic');
+                setTimeout(() => card.classList.remove('animate-levelup-epic'), 700);
             }
-        }, 50);
+        }, 30);
     }
-
-    // --- PROFILE AND CALCULATION ---
 
     function calculateCategoryStars(avgLevel) {
         if (avgLevel >= 45) return '★★★★★';
@@ -797,10 +840,7 @@
         exerciseDB.forEach(ex => {
             let uEx = userData.exercises[ex.id];
             if (uEx && uEx.unlocked) {
-                // Add flat base levels
                 cumulativeLevel += uEx.level;
-                
-                // Effective level accounts for visual star unlocks too (1 Star = +10 Level worth of power metric)
                 let effectiveLevel = uEx.level + (uEx.stars * 10);
                 categories[ex.cat].totalEffectiveLvl += effectiveLevel;
                 categories[ex.cat].count++;
@@ -809,7 +849,6 @@
 
         document.getElementById('prof-total-level').innerText = "Gesamt-Level: " + cumulativeLevel;
 
-        // Process individual metric nodes (ONLY active/unlocked exercises are divided)
         for (const [key, data] of Object.entries(categories)) {
             let domKey = key.toLowerCase();
             let avg = data.count > 0 ? Math.round(data.totalEffectiveLvl / data.count) : 0;
@@ -819,8 +858,6 @@
             document.getElementById(`stars-${domKey}`).innerText = calculateCategoryStars(avg);
         }
     }
-
-    // --- TIMELINE STATISTICS & GRAPH SYSTEM ---
 
     function changeTimeFilter(filter, element) {
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -853,7 +890,6 @@
                 let d = new Date();
                 d.setDate(now.getDate() - i);
                 let dateStr = d.toISOString().split('T')[0];
-                // Only label every 5th day to avoid visual clutter
                 let label = (i % 5 === 0) ? d.toLocaleDateString('de-DE', { day: 'numeric', month: 'short' }) : '';
                 dataPoints.push({ label: label, value: userData.history[dateStr] || 0, date: dateStr });
             }
@@ -865,7 +901,6 @@
                 d.setMonth(now.getMonth() - i);
                 let monthKey = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
                 
-                // Aggregate all days of that specific month
                 let monthlySum = 0;
                 for (const [dateStr, val] of Object.entries(userData.history)) {
                     if (dateStr.startsWith(monthKey)) monthlySum += val;
@@ -875,8 +910,7 @@
             }
         } 
         else if (currentXpTimelineFilter === 'all') {
-            viewTitle.innerText = "Gesamte Historie (Letzte 6 Monate aggregiert)";
-            // Group by year-month for total layout stability
+            viewTitle.innerText = "Gesamte Historie (Letzte 6 Monate)";
             for (let i = 5; i >= 0; i--) {
                 let d = new Date();
                 d.setMonth(now.getMonth() - i);
@@ -890,10 +924,8 @@
             }
         }
 
-        // Find Maximum value for custom relative CSS scaling
         let maxValue = Math.max(...dataPoints.map(p => p.value), 100);
 
-        // Append decorative dotted structural lines
         let axisHtml = `<div class="chart-bar-axis">
             <div style="text-align:right; padding-right:5px;">${Math.round(maxValue)} XP</div><div class="axis-line"></div>
             <div style="text-align:right; padding-right:5px;">${Math.round(maxValue/2)} XP</div><div class="axis-line"></div>
@@ -901,14 +933,13 @@
         </div>`;
         container.innerHTML += axisHtml;
 
-        // Render Bars
         dataPoints.forEach(pt => {
             let heightPercent = (pt.value / maxValue) * 100;
             
             let barHtml = `
                 <div class="bar-wrapper">
                     <div class="bar" style="height: ${heightPercent}%;">
-                        <div class="tooltip">${pt.value} XP<br><span style="font-size:9px;color:var(--text-muted)">${pt.date}</span></div>
+                        <div class="tooltip">${pt.value} XP<br><span style="font-size:9px;color:#64748b">${pt.date}</span></div>
                     </div>
                     <div class="bar-label">${pt.label}</div>
                 </div>
@@ -916,7 +947,6 @@
             container.innerHTML += barHtml;
         });
 
-        // Compute Simple Global Stats Grid Footer Values
         let totalXpSum = Object.values(userData.history).reduce((a, b) => a + b, 0);
         let todayKey = new Date().toISOString().split('T')[0];
         let todayXp = userData.history[todayKey] || 0;
@@ -924,14 +954,11 @@
         document.getElementById('sum-total-xp').innerText = totalXpSum.toLocaleString() + " XP";
         document.getElementById('sum-today-xp').innerText = todayXp.toLocaleString() + " XP";
         
-        // Dynamic search for top active categories based on active counts
         let cats = {Push:0, Pull:0, Core:0, Legs:0};
         exerciseDB.forEach(ex => { if(userData.exercises[ex.id].unlocked) cats[ex.cat]++ });
         let topCat = Object.keys(cats).reduce((a, b) => cats[a] > cats[b] ? a : b);
-        document.getElementById('sum-top-cat').innerText = cats[topCat] > 0 ? topCat : "Keine";
+        document.getElementById('sum-top-cat').innerText = cats[topCat] > 0 ? topCat : "-";
     }
-
-    // --- APPLICATION HELPER UTILITIES ---
 
     function switchTab(tabId, btnElement) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -953,22 +980,7 @@
                 if (parsed.exercises && parsed.history) {
                     userData = parsed;
                 }
-            } catch(e) { console.error("Fehler beim Laden der Spieldaten", e); }
-        }
-    }
-
-    function generateDemoHistory() {
-        // Generates dynamic active profile history over past 40 days to preview the graph tabs
-        let d = new Date();
-        for (let i = 40; i >= 0; i--) {
-            let targetDate = new Date();
-            targetDate.setDate(d.getDate() - i);
-            let dateKey = targetDate.toISOString().split('T')[0];
-            
-            // Random rewards simulating regular training sessions
-            if (Math.random() > 0.4) {
-                userData.history[dateKey] = Math.floor(Math.random() * 450) + 50;
-            }
+            } catch(e) { console.error("Fehler beim Laden", e); }
         }
     }
 
