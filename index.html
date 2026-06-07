@@ -711,12 +711,19 @@
     }
 
     function unlock(id) {
-        userData.exercises[id].unlocked = true;
-        trackXpGain(50);
-        saveData();
-        renderExercises();
-        updateProfile();
-        renderAnalytics();
+        // Finde die genaue Übung im Array für einen dynamischen Text
+        const dbEx = exerciseDB.find(e => e.id === id);
+        const exName = dbEx ? dbEx.name : "diese Übung";
+        
+        // Bestätigungsabfrage vor dem Freischalten
+        if (confirm(`Bist du sicher, dass du "${exName}" freischalten möchtest?`)) {
+            userData.exercises[id].unlocked = true;
+            trackXpGain(50);
+            saveData();
+            renderExercises();
+            updateProfile();
+            renderAnalytics();
+        }
     }
 
     function addReps(id, reps) {
@@ -1011,8 +1018,6 @@
         }
     }
 
-    // Die Test-Funktionen bleiben im Hintergrund der Engine erhalten, 
-    // falls du sie je über die Browser-Konsole (F12) aufrufen willst.
     function cheatMaxLevel() {
         Object.keys(userData.exercises).forEach(id => {
             userData.exercises[id].unlocked = true;
